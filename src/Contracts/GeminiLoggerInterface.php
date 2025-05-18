@@ -2,13 +2,15 @@
 
 namespace Sanjarani\Gemini\Contracts;
 
+use Sanjarani\Gemini\Contracts\GeminiResponseInterface;
+
 interface GeminiLoggerInterface
 {
     /**
      * Log a request to the Gemini API.
      *
-     * @param array $payload The request payload
-     * @param string $model The model used
+     * @param array $payload
+     * @param string $model
      * @return void
      */
     public function logRequest(array $payload, string $model): void;

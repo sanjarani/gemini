@@ -2,7 +2,7 @@
 
 namespace Sanjarani\Gemini\Support;
 
-use Illuminate\Contracts\Logging\Log;
+use Illuminate\Log\Logger;
 use Sanjarani\Gemini\Contracts\GeminiLoggerInterface;
 use Sanjarani\Gemini\Contracts\GeminiResponseInterface;
 
@@ -11,9 +11,9 @@ class GeminiLogger implements GeminiLoggerInterface
     /**
      * The log instance.
      *
-     * @var \Illuminate\Contracts\Logging\Log
+     * @var \Illuminate\Log\Logger
      */
-    protected Log $log;
+    protected Logger $log;
 
     /**
      * Whether logging is enabled.
@@ -25,11 +25,11 @@ class GeminiLogger implements GeminiLoggerInterface
     /**
      * Create a new logger instance.
      *
-     * @param \Illuminate\Contracts\Logging\Log $log
+     * @param \Illuminate\Log\Logger $log
      * @param bool $enabled
      */
     public function __construct(
-        Log $log,
+        Logger $log,
         bool $enabled = false
     ) {
         $this->log = $log;

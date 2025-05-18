@@ -2,7 +2,7 @@
 
 namespace Sanjarani\Gemini\Tests\Unit;
 
-use Illuminate\Contracts\Logging\Log;
+use Illuminate\Log\Logger;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 use Sanjarani\Gemini\Contracts\GeminiResponseInterface;
@@ -19,7 +19,7 @@ class GeminiLoggerTest extends TestCase
     public function testLogRequestWhenLoggingIsDisabled()
     {
         // Mock dependencies
-        $log = Mockery::mock(Log::class);
+        $log = Mockery::mock(Logger::class);
         
         // Create logger with disabled flag
         $logger = new GeminiLogger($log, false);
@@ -34,7 +34,7 @@ class GeminiLoggerTest extends TestCase
     public function testLogRequestWhenLoggingIsEnabled()
     {
         // Mock dependencies
-        $log = Mockery::mock(Log::class);
+        $log = Mockery::mock(Logger::class);
         
         // Create logger with enabled flag
         $logger = new GeminiLogger($log, true);
@@ -56,7 +56,7 @@ class GeminiLoggerTest extends TestCase
     public function testLogResponseWhenLoggingIsDisabled()
     {
         // Mock dependencies
-        $log = Mockery::mock(Log::class);
+        $log = Mockery::mock(Logger::class);
         $response = Mockery::mock(GeminiResponseInterface::class);
         
         // Create logger with disabled flag
@@ -72,7 +72,7 @@ class GeminiLoggerTest extends TestCase
     public function testLogResponseWhenLoggingIsEnabled()
     {
         // Mock dependencies
-        $log = Mockery::mock(Log::class);
+        $log = Mockery::mock(Logger::class);
         $response = Mockery::mock(GeminiResponseInterface::class);
         
         // Set up response expectations
@@ -111,7 +111,7 @@ class GeminiLoggerTest extends TestCase
     public function testLogErrorWhenLoggingIsDisabled()
     {
         // Mock dependencies
-        $log = Mockery::mock(Log::class);
+        $log = Mockery::mock(Logger::class);
         $exception = new \Exception('Test error');
         
         // Create logger with disabled flag
@@ -127,7 +127,7 @@ class GeminiLoggerTest extends TestCase
     public function testLogErrorWhenLoggingIsEnabled()
     {
         // Mock dependencies
-        $log = Mockery::mock(Log::class);
+        $log = Mockery::mock(Logger::class);
         $exception = new \Exception('Test error', 500);
         
         // Create logger with enabled flag
