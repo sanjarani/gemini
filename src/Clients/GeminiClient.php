@@ -53,6 +53,13 @@ class GeminiClient implements GeminiClientInterface
     protected int $timeout;
 
     /**
+     * Available models cache.
+     *
+     * @var array|null
+     */
+    protected ?array $availableModels = null;
+
+    /**
      * Create a new Gemini client instance.
      *
      * @param string $apiKey
@@ -89,9 +96,11 @@ class GeminiClient implements GeminiClientInterface
     {
         $model = $model ?? $this->model;
         
-        // Updated endpoint URL format for Gemini API v1
-        // Removed 'models/' prefix as per latest API requirements
-        $endpoint = "{$this->baseUrl}/{$model}:generateContent";
+        // Validate the model against available models
+        $this->validateModel($model);
+        
+        // Determine the correct endpoint based on the model and operation
+        $endpoint = $this->getEndpointForModel($model, 'generateContent');
         
         try {
             $response = $this->makeRequest()
@@ -112,6 +121,108 @@ class GeminiClient implements GeminiClientInterface
                 $e
             );
         }
+    }
+
+    /**
+     * Validate that the model exists and is supported.
+     *
+     * @param string $model
+     * @return void
+     * @throws \Sanjarani\Gemini\Exceptions\GeminiModelNotFoundException
+     */
+    protected function validateModel(string $model): void
+    {
+        // Get available models if not already fetched
+        if ($this->availableModels === null) {
+            $this->fetchAvailableModels();
+        }
+        
+        // Check if the model exists in available models
+        $modelExists = false;
+        foreach ($this->availableModels as $availableModel) {
+            if ($availableModel['name'] === $model || 
+                $availableModel['name'] === "models/{$model}" || 
+                str_ends_with($availableModel['name'], "/{$model}")) {
+                $modelExists = true;
+                break;
+            }
+        }
+        
+        if (!$modelExists) {
+            $availableModelNames = array_map(function($m) {
+                return $m['name'];
+            }, $this->availableModels);
+            
+            throw new GeminiModelNotFoundException(
+                "Model '{$model}' not found or not supported. Available models: " . implode(', ', $availableModelNames)
+            );
+        }
+    }
+
+    /**
+     * Fetch available models from the API.
+     *
+     * @return void
+     * @throws \Sanjarani\Gemini\Exceptions\GeminiApiException
+     */
+    protected function fetchAvailableModels(): void
+    {
+        try {
+            $endpoint = "{$this->baseUrl}/models";
+            $response = $this->makeRequest()->get($endpoint);
+            
+            $this->handleResponseErrors($response);
+            
+            $data = $response->json();
+            $this->availableModels = $data['models'] ?? [];
+            
+            if (empty($this->availableModels)) {
+                throw new GeminiApiException("No models returned from the API.");
+            }
+        } catch (GeminiApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw new GeminiNetworkException(
+                "Network error while fetching available models: {$e->getMessage()}",
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
+     * Get the correct endpoint for a model and operation.
+     *
+     * @param string $model
+     * @param string $operation
+     * @return string
+     */
+    protected function getEndpointForModel(string $model, string $operation): string
+    {
+        // Check if model already includes the full path
+        if (str_starts_with($model, 'models/')) {
+            return "{$this->baseUrl}/{$model}:{$operation}";
+        }
+        
+        // Find the model in available models to get the correct path
+        if ($this->availableModels !== null) {
+            foreach ($this->availableModels as $availableModel) {
+                if ($availableModel['name'] === $model || 
+                    str_ends_with($availableModel['name'], "/{$model}")) {
+                    return "{$this->baseUrl}/{$availableModel['name']}:{$operation}";
+                }
+            }
+        }
+        
+        // Default format if model not found in available models
+        // Try both formats that might work with the API
+        $formats = [
+            "{$this->baseUrl}/{$model}:{$operation}",
+            "{$this->baseUrl}/models/{$model}:{$operation}"
+        ];
+        
+        // Use the first format by default, but we'll try both if needed
+        return $formats[0];
     }
 
     /**
