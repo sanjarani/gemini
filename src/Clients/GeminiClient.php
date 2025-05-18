@@ -88,7 +88,10 @@ class GeminiClient implements GeminiClientInterface
     public function send(array $payload, ?string $model = null): GeminiResponseInterface
     {
         $model = $model ?? $this->model;
-        $endpoint = "{$this->baseUrl}/models/{$model}:generateContent";
+        
+        // Updated endpoint URL format for Gemini API v1
+        // Removed 'models/' prefix as per latest API requirements
+        $endpoint = "{$this->baseUrl}/{$model}:generateContent";
         
         try {
             $response = $this->makeRequest()
