@@ -1,6 +1,6 @@
 <?php
 
-namespace Sanjarani\Gemini;
+namespace Sanjarani\Gemini\Gemini;
 
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Sanjarani\Gemini\Contracts\TextGenerationServiceInterface;
@@ -202,9 +202,19 @@ class Gemini
                     ]
                 ]
             ],
-            'generationConfig' => $this->prepareGenerationConfig($options),
-            'safetySettings' => $this->prepareSafetySettings($options),
         ];
+        
+        // Only add generationConfig if there are actual settings
+        $generationConfig = $this->prepareGenerationConfig($options);
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
+        }
+        
+        // Only add safetySettings if there are actual settings
+        $safetySettings = $this->prepareSafetySettings($options);
+        if (!empty($safetySettings)) {
+            $payload['safetySettings'] = $safetySettings;
+        }
         
         return RunGeminiJob::dispatch(
             $payload,
@@ -252,9 +262,19 @@ class Gemini
         
         $payload = [
             'contents' => $contents,
-            'generationConfig' => $this->prepareGenerationConfig($options),
-            'safetySettings' => $this->prepareSafetySettings($options),
         ];
+        
+        // Only add generationConfig if there are actual settings
+        $generationConfig = $this->prepareGenerationConfig($options);
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
+        }
+        
+        // Only add safetySettings if there are actual settings
+        $safetySettings = $this->prepareSafetySettings($options);
+        if (!empty($safetySettings)) {
+            $payload['safetySettings'] = $safetySettings;
+        }
         
         return RunGeminiJob::dispatch(
             $payload,
@@ -306,7 +326,7 @@ class Gemini
      */
     protected function prepareSafetySettings(array $options): array
     {
-        if (!isset($options['safety_settings'])) {
+        if (!isset($options['safety_settings']) || empty($options['safety_settings'])) {
             return [];
         }
         

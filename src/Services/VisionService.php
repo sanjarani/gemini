@@ -109,9 +109,19 @@ class VisionService implements VisionServiceInterface
                     'parts' => $parts
                 ]
             ],
-            'generationConfig' => $this->prepareGenerationConfig($options),
-            'safetySettings' => $this->prepareSafetySettings($options),
         ];
+        
+        // Only add generationConfig if there are actual settings
+        $generationConfig = $this->prepareGenerationConfig($options);
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
+        }
+        
+        // Only add safetySettings if there are actual settings
+        $safetySettings = $this->prepareSafetySettings($options);
+        if (!empty($safetySettings)) {
+            $payload['safetySettings'] = $safetySettings;
+        }
         
         // Generate cache key
         $cacheKey = $this->generateCacheKey($imagePath . ($prompt ?? ''), $options);
@@ -174,9 +184,19 @@ class VisionService implements VisionServiceInterface
                     'parts' => $parts
                 ]
             ],
-            'generationConfig' => $this->prepareGenerationConfig($options),
-            'safetySettings' => $this->prepareSafetySettings($options),
         ];
+        
+        // Only add generationConfig if there are actual settings
+        $generationConfig = $this->prepareGenerationConfig($options);
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
+        }
+        
+        // Only add safetySettings if there are actual settings
+        $safetySettings = $this->prepareSafetySettings($options);
+        if (!empty($safetySettings)) {
+            $payload['safetySettings'] = $safetySettings;
+        }
         
         // Generate cache key
         $cacheKey = $this->generateCacheKey(implode('', $imagePaths) . ($prompt ?? ''), $options);
@@ -237,9 +257,19 @@ class VisionService implements VisionServiceInterface
                     'parts' => $parts
                 ]
             ],
-            'generationConfig' => $this->prepareGenerationConfig($options),
-            'safetySettings' => $this->prepareSafetySettings($options),
         ];
+        
+        // Only add generationConfig if there are actual settings
+        $generationConfig = $this->prepareGenerationConfig($options);
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
+        }
+        
+        // Only add safetySettings if there are actual settings
+        $safetySettings = $this->prepareSafetySettings($options);
+        if (!empty($safetySettings)) {
+            $payload['safetySettings'] = $safetySettings;
+        }
         
         // Generate cache key
         $cacheKey = $this->generateCacheKey(md5($base64Image) . ($prompt ?? ''), $options);
@@ -360,7 +390,7 @@ class VisionService implements VisionServiceInterface
      */
     protected function prepareSafetySettings(array $options): array
     {
-        if (!isset($options['safety_settings'])) {
+        if (!isset($options['safety_settings']) || empty($options['safety_settings'])) {
             return [];
         }
         

@@ -81,9 +81,19 @@ class TextGenerationService implements TextGenerationServiceInterface
                     ]
                 ]
             ],
-            'generationConfig' => $this->prepareGenerationConfig($options),
-            'safetySettings' => $this->prepareSafetySettings($options),
         ];
+        
+        // Only add generationConfig if there are actual settings
+        $generationConfig = $this->prepareGenerationConfig($options);
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
+        }
+        
+        // Only add safetySettings if there are actual settings
+        $safetySettings = $this->prepareSafetySettings($options);
+        if (!empty($safetySettings)) {
+            $payload['safetySettings'] = $safetySettings;
+        }
         
         $this->logger->logRequest($payload, $model ?? $this->client->getModel());
         
@@ -122,9 +132,19 @@ class TextGenerationService implements TextGenerationServiceInterface
         
         $payload = [
             'contents' => $contents,
-            'generationConfig' => $this->prepareGenerationConfig($options),
-            'safetySettings' => $this->prepareSafetySettings($options),
         ];
+        
+        // Only add generationConfig if there are actual settings
+        $generationConfig = $this->prepareGenerationConfig($options);
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
+        }
+        
+        // Only add safetySettings if there are actual settings
+        $safetySettings = $this->prepareSafetySettings($options);
+        if (!empty($safetySettings)) {
+            $payload['safetySettings'] = $safetySettings;
+        }
         
         $this->logger->logRequest($payload, $model ?? $this->client->getModel());
         
@@ -189,7 +209,7 @@ class TextGenerationService implements TextGenerationServiceInterface
      */
     protected function prepareSafetySettings(array $options): array
     {
-        if (!isset($options['safety_settings'])) {
+        if (!isset($options['safety_settings']) || empty($options['safety_settings'])) {
             return [];
         }
         
