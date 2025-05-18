@@ -1,6 +1,6 @@
 <?php
 
-namespace Sanjarani\Gemini\Gemini;
+namespace Sanjarani\Gemini;
 
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Sanjarani\Gemini\Contracts\TextGenerationServiceInterface;
