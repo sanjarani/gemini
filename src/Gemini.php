@@ -5,6 +5,7 @@ namespace Sanjarani\Gemini;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Sanjarani\Gemini\Contracts\TextGenerationServiceInterface;
 use Sanjarani\Gemini\Contracts\VisionServiceInterface;
+use Sanjarani\Gemini\Contracts\EmbeddingServiceInterface;
 use Sanjarani\Gemini\Jobs\RunGeminiJob;
 
 class Gemini
