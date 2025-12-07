@@ -4,40 +4,40 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/sanjarani/gemini.svg?style=flat-square)](https://packagist.org/packages/sanjarani/gemini)
 [![License](https://img.shields.io/packagist/l/sanjarani/gemini.svg?style=flat-square)](https://packagist.org/packages/sanjarani/gemini)
 
-یک پکیج حرفه‌ای، توسعه‌پذیر و مقیاس‌پذیر برای کار با Google Gemini API در فریم‌ورک Laravel.
+A professional, extensible, and scalable package for integrating the Google Gemini API into the Laravel framework.
 
-## ویژگی‌ها
+## Features
 
-- پشتیبانی از تمامی مدل‌های Gemini (gemini-pro، gemini-pro-vision و غیره)
-- قابلیت تغییر مدل در runtime
-- استفاده از Laravel HTTP Client با مدیریت خطای دقیق
-- طراحی بر اساس سرویس‌محور بودن و Dependency Injection
-- پشتیبانی از Prompt Caching برای صرفه‌جویی در توکن‌ها و پاسخ‌دهی سریع‌تر
-- شمارش توکن ورودی و خروجی با تخمین هزینه
-- پشتیبانی از اجرای async با Queue و Job اختصاصی
-- کنترل دقیق نرخ ارسال درخواست‌ها و خطاهای مرتبط با Rate Limit
-- فاساد برای دسترسی آسان‌تر
-- میدلور برای مدیریت درخواست‌ها
-- سیستم لاگینگ قابل تنظیم
-- پشتیبانی از ایجاد embedding و محاسبه شباهت متن‌ها
+- Support for all Gemini models (gemini-pro, gemini-pro-vision, etc.)
+- Capability to switch models at runtime
+- Built on Laravel HTTP Client with precise error handling
+- Service-oriented architecture with Dependency Injection support
+- Support for Prompt Caching to save on tokens and achieve faster response times
+- Input/Output token counting with cost estimation
+- Support for async execution using dedicated Queues and Jobs
+- Precise rate limiting control and handling of Rate Limit errors
+- Facade for easy access
+- Middleware for request management
+- Configurable logging system
+- Support for generating embeddings and calculating text similarity
 
-## نصب
+## Installation
 
-این پکیج را می‌توانید با Composer نصب کنید:
+You can install this package via Composer:
 
 ```bash
 composer require sanjarani/gemini
-```php
+```
 
-سپس فایل پیکربندی را منتشر کنید:
+Then, publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag=gemini-config
-```php
+```
 
-## پیکربندی
+## Configuration
 
-پس از انتشار فایل پیکربندی، می‌توانید تنظیمات را در فایل `config/gemini.php` انجام دهید. همچنین می‌توانید از متغیرهای محیطی در فایل `.env` استفاده کنید:
+After publishing the configuration file, you can configure the settings in `config/gemini.php`. You can also use environment variables in your `.env` file:
 
 ```env
 GEMINI_API_KEY=your-api-key
@@ -46,141 +46,146 @@ GEMINI_REQUEST_TIMEOUT=30
 GEMINI_ENABLE_CACHE=false
 GEMINI_CACHE_TTL=3600
 GEMINI_ENABLE_LOGGING=false
-```php
+```
 
-## نحوه استفاده
+## Usage
 
-### تولید متن با مدل Gemini
+### Text Generation with Gemini Model
 
 ```php
 use Sanjarani\Gemini\Facades\Gemini;
 
-// استفاده ساده
-$response = Gemini::generate('به من در مورد هوش مصنوعی بگو');
+// Simple usage
+$response = Gemini::generate('Tell me about Artificial Intelligence');
 echo $response->content();
 
-// استفاده با تنظیمات بیشتر
-$response = Gemini::generate('به من در مورد هوش مصنوعی بگو', [
+// Usage with additional configuration
+$response = Gemini::generate('Tell me about Artificial Intelligence', [
     'temperature' => 0.7,
     'top_p' => 0.9,
     'top_k' => 40,
     'max_tokens' => 500,
 ]);
-```php
+```
 
-### گفتگو با مدل Gemini
+### Chatting with Gemini Model
 
 ```php
 use Sanjarani\Gemini\Facades\Gemini;
 
 $messages = [
-    ['role' => 'user', 'content' => 'سلام، حالت چطوره؟'],
-    ['role' => 'model', 'content' => 'سلام! من خوبم، چطور می‌تونم کمکت کنم؟'],
-    ['role' => 'user', 'content' => 'می‌خوام در مورد برنامه‌نویسی PHP بیشتر یاد بگیرم.'],
+    ['role' => 'user', 'content' => 'Hello, how are you?'],
+    ['role' => 'model', 'content' => 'Hello! I am doing well, how can I help you?'],
+    ['role' => 'user', 'content' => 'I want to learn more about PHP programming.'],
 ];
 
 $response = Gemini::chat($messages);
 echo $response->content();
-```php
+```
 
-### استفاده از مدل Vision برای تحلیل تصاویر
+### Using Vision Model for Image Analysis
 
 ```php
 use Sanjarani\Gemini\Facades\Gemini;
 
-// تحلیل یک تصویر
+// Analyze a single image
 $response = Gemini::generateFromImage(
     '/path/to/image.jpg',
-    'این تصویر را توصیف کن'
+    'Describe this image'
 );
 
-// تحلیل چند تصویر
+// Analyze multiple images
 $response = Gemini::generateFromMultipleImages(
     ['/path/to/image1.jpg', '/path/to/image2.jpg'],
-    'این دو تصویر را مقایسه کن'
+    'Compare these two images'
 );
 
-### استفاده از تصویر base64
+### Using Base64 Image
 $base64Image = 'data:image/jpeg;base64,...';
 $response = Gemini::generateFromBase64Image(
     $base64Image,
-    'این تصویر را توصیف کن'
+    'Describe this image'
 );
+```
 
-### ایجاد embedding برای متن
-$response = Gemini::embedText('این یک متن نمونه است');
+### Embeddings
+
+```php
+// Create embedding for text
+$response = Gemini::embedText('This is a sample text');
 $embedding = $response->raw()['embedding']['values'];
 
-### ایجاد embedding برای چندین متن
-$texts = ['متن اول', 'متن دوم', 'متن سوم'];
+// Create embedding for a batch of texts
+$texts = ['First text', 'Second text', 'Third text'];
 $response = Gemini::embedBatch($texts);
 
-### محاسبه شباهت بین دو embedding
+// Calculate similarity between two embeddings
 $embedding1 = $response1->raw()['embedding']['values'];
 $embedding2 = $response2->raw()['embedding']['values'];
 $similarity = Gemini::calculateSimilarity($embedding1, $embedding2);
-echo "Similarity score: {$similarity}"; // عددی بین 0 تا 1``
+echo "Similarity score: {$similarity}"; // A number between 0 and 1
+```
 
-### تغییر مدل در runtime
+### Runtime Model Switching
 
 ```php
 use Sanjarani\Gemini\Facades\Gemini;
 
 $response = Gemini::setModel('gemini-ultra')
-    ->generate('یک داستان کوتاه بنویس');
-```php
+    ->generate('Write a short story');
+```
 
-### استفاده از اجرای غیرهمزمان
+### Async Execution
 
 ```php
 use Sanjarani\Gemini\Facades\Gemini;
 use App\Handlers\GeminiResponseHandler;
 
-// اجرای غیرهمزمان با callback
+// Async execution with callback
 Gemini::generateAsync(
-    'یک مقاله در مورد هوش مصنوعی بنویس',
+    'Write an article about AI',
     [],
     GeminiResponseHandler::class,
     'handleResponse',
     ['article_id' => 123]
 );
-```php
+```
 
-### دسترسی به اطلاعات پاسخ
+### Accessing Response Data
 
 ```php
 use Sanjarani\Gemini\Facades\Gemini;
 
-$response = Gemini::generate('سلام، حالت چطوره؟');
+$response = Gemini::generate('Hello, how are you?');
 
-// دسترسی به متن پاسخ
+// Access response text
 echo $response->content();
 
-// دسترسی به داده‌های خام پاسخ
+// Access raw response data
 $rawData = $response->raw();
 
-// دسترسی به اطلاعات توکن
+// Access token usage information
 $tokenUsage = $response->tokenUsage();
 echo "Prompt tokens: {$tokenUsage['prompt_tokens']}\n";
 echo "Completion tokens: {$tokenUsage['completion_tokens']}\n";
 echo "Total tokens: {$tokenUsage['total_tokens']}\n";
 
-// دسترسی به هزینه تخمینی
+// Access estimated cost
 echo "Estimated cost: \${$response->estimatedCost()}\n";
 
-// دسترسی به مدل استفاده شده
+// Access used model
 echo "Model: {$response->model()}\n";
 
-// دسترسی به دلیل پایان پاسخ
+// Access finish reason
 echo "Finish reason: {$response->finishReason()}\n";
 
-// بررسی موفقیت‌آمیز بودن درخواست
+// Check if request was successful
 if ($response->successful()) {
     echo "Request was successful!\n";
 }
-```php
+```
 
-### استفاده از تزریق وابستگی
+### Dependency Injection
 
 ```php
 use Sanjarani\Gemini\Contracts\TextGenerationServiceInterface;
@@ -199,43 +204,43 @@ class MyService
         return $this->textService->generate($prompt);
     }
 }
-```php
+```
 
-### استفاده از میدلور Rate Limiting
+### Rate Limiting Middleware
 
-در فایل `app/Http/Kernel.php`:
+In `app/Http/Kernel.php`:
 
 ```php
 protected $routeMiddleware = [
     // ...
     'gemini.limit' => \Sanjarani\Gemini\Middleware\GeminiRateLimitMiddleware::class,
 ];
-```php
+```
 
-در روت‌ها:
+In Routes:
 
 ```php
 Route::post('/generate', [GeminiController::class, 'generate'])
-    ->middleware('gemini.limit:60,1'); // 60 درخواست در هر دقیقه
-```php
+    ->middleware('gemini.limit:60,1'); // 60 requests per minute
+```
 
-## دستورات Artisan
+## Artisan Commands
 
-### تست Gemini API
+### Test Gemini API
 
 ```bash
-php artisan gemini:test "سلام، حالت چطوره؟"
-```php
+php artisan gemini:test "Hello, how are you?"
+```
 
-### پاک کردن کش Gemini
+### Clear Gemini Cache
 
 ```bash
 php artisan gemini:cache-clear
-```php
+```
 
-## مدیریت خطاها
+## Error Handling
 
-این پکیج خطاهای مختلف را با استثناهای اختصاصی مدیریت می‌کند:
+This package handles various errors using dedicated exceptions:
 
 ```php
 use Sanjarani\Gemini\Facades\Gemini;
@@ -246,37 +251,37 @@ use Sanjarani\Gemini\Exceptions\GeminiNetworkException;
 use Sanjarani\Gemini\Exceptions\GeminiConfigurationException;
 
 try {
-    $response = Gemini::generate('سلام، حالت چطوره؟');
+    $response = Gemini::generate('Hello, how are you?');
 } catch (GeminiApiRateLimitException $e) {
-    // مدیریت خطای محدودیت نرخ درخواست
+    // Handle rate limit error
     echo "Rate limit exceeded: {$e->getMessage()}";
 } catch (GeminiModelNotFoundException $e) {
-    // مدیریت خطای عدم وجود مدل
+    // Handle model not found error
     echo "Model not found: {$e->getMessage()}";
 } catch (GeminiNetworkException $e) {
-    // مدیریت خطای شبکه
+    // Handle network error
     echo "Network error: {$e->getMessage()}";
 } catch (GeminiConfigurationException $e) {
-    // مدیریت خطای پیکربندی
+    // Handle configuration error
     echo "Configuration error: {$e->getMessage()}";
 } catch (GeminiApiException $e) {
-    // مدیریت سایر خطاهای API
+    // Handle other API errors
     echo "API error: {$e->getMessage()}";
 }
-```php
+```
 
-## تست‌ها
+## Testing
 
-برای اجرای تست‌ها:
+To run tests:
 
 ```bash
 composer test
-```php
+```
 
-## مشارکت
+## Contribution
 
-مشارکت‌ها با آغوش باز پذیرفته می‌شوند! لطفاً قبل از ارسال pull request، تست‌ها را اجرا کنید.
+Contributions are welcome! Please run the tests before submitting a pull request.
 
-## لایسنس
+## License
 
-این پکیج تحت لایسنس MIT منتشر شده است. برای اطلاعات بیشتر، فایل [LICENSE](LICENSE) را مشاهده کنید.
+This package is released under the MIT License. Please see the [LICENSE](LICENSE) file for more information.
